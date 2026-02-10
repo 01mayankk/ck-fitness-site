@@ -48,12 +48,44 @@
 
 "use client";
 
-export default function Countdown() {
-  // Return null so the component renders nothing
-  return null;
+import { useEffect, useState } from "react";
 
-  /* Old logic preserved for future use:
+export default function Countdown() {
   const openingDate = new Date("2025-12-15T00:00:00").getTime();
-  ...
-  */
+  const [isOpened, setIsOpened] = useState(false);
+
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0, hours: 0, minutes: 0, seconds: 0,
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const diff = openingDate - now;
+
+      if (diff <= 0) {
+        setIsOpened(true); // Mark as opened
+        clearInterval(timer);
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [openingDate]);
+
+  // ⭐ FIX: If the gym is open, don't render anything
+  if (isOpened) return null;
+
+  return (
+    <section className="py-16 bg-[#0A0F1F] text-center">
+      {/* ... your existing UI ... */}
+    </section>
+  );
 }

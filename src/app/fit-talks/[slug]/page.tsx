@@ -3,11 +3,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { fetchPosts } from "@/lib/googleSheets";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { FiArrowLeft, FiCalendar } from "react-icons/fi";
+import FormattedContent from "@/components/FormattedContent";
 
 type Post = {
   id: string;
@@ -15,7 +16,7 @@ type Post = {
   title: string;
   excerpt: string | null;
   content: string;
-  cover_image_url: string | null;
+  image_url: string | null;
   category: string | null;
   created_at: string;
 };
@@ -32,39 +33,21 @@ export default function PostPage({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPost = async () => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select(
-          "id, slug, title, excerpt, content, cover_image_url, category, created_at"
-        )
-        .eq("slug", slug)
-        .eq("published", true)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error loading post:", error.message);
-        setLoading(false);
-        return;
-      }
-
-      if (!data) {
-        setPost(null);
-      } else {
-        setPost(data as Post);
-      }
-
+    const load = async () => {
+      const data = await fetchPosts();
+      const found = data.find((p: any) => p.slug === slug);
+      setPost(found || null);
       setLoading(false);
     };
 
-    fetchPost();
+    load();
   }, [slug]);
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#050814] text-white pt-24 pb-16 px-6 flex items-center justify-center">
-        <p className="text-gray-400">Loading article…</p>
-      </main>
+      <div className="min-h-screen bg-[#050814] text-white pt-24 pb-16 px-6 flex items-center justify-center">
+        <p className="text-gray-400">Loading story...</p>
+      </div>
     );
   }
 
@@ -82,7 +65,7 @@ export default function PostPage({
     );
   }
 
-  const created = new Date(post.created_at).toLocaleDateString();
+  const created = post.created_at ? new Date(post.created_at).toLocaleDateString() : "New Story";
 
   return (
     <main className="min-h-screen bg-[#050814] text-white pt-24 pb-16 px-6">
@@ -121,14 +104,14 @@ export default function PostPage({
 
         {/* Excerpt */}
         {post.excerpt && (
-          <p className="text-gray-300 text-base mb-5">{post.excerpt}</p>
+          <p className="text-gray-300 text-base mb-5 italic">{post.excerpt}</p>
         )}
 
         {/* Cover image */}
-        {post.cover_image_url && (
-          <div className="relative w-full h-64 sm:h-80 mb-8 rounded-2xl overflow-hidden border border-white/10">
+        {post.image_url && (
+          <div className="relative w-full h-64 sm:h-80 mb-8 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
             <Image
-              src={post.cover_image_url}
+              src={post.image_url}
               alt={post.title}
               fill
               className="object-cover"
@@ -136,11 +119,9 @@ export default function PostPage({
           </div>
         )}
 
-        {/* Content – simple text (line breaks respected) */}
-        <article className="prose prose-invert max-w-none prose-p:mb-4 prose-p:text-gray-100 prose-strong:text-white prose-h2:text-white prose-h3:text-white">
-          <p className="whitespace-pre-line text-base leading-relaxed text-gray-100">
-            {post.content}
-          </p>
+        {/* Content */}
+        <article className="prose prose-invert max-w-none prose-p:mb-4 prose-p:text-gray-200 prose-strong:text-white prose-h2:text-white prose-h3:text-white">
+          <FormattedContent content={post.content} />
         </article>
       </motion.div>
     </main>

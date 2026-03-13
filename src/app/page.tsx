@@ -13,48 +13,8 @@ const bebas = Bebas_Neue({
   weight: "400",
 });
 
-// Countdown type
-type TimeLeft = {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-};
-
-// Opening date
-const OPENING_DATE = new Date("2025-12-15T00:00:00");
 
 export default function HomePage() {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
-
-  // Countdown logic
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date().getTime();
-      const diff = OPENING_DATE.getTime() - now;
-
-      if (diff <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-      setTimeLeft({ days, hours, minutes, seconds });
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <main className="min-h-screen bg-[#050814] text-white">
@@ -138,7 +98,7 @@ export default function HomePage() {
               transition={{ delay: 1.2, duration: 1 }}
             >
               <Link
-                href="/auth/signup"
+                href="/membership"
                 className="px-5 py-3 rounded-md font-semibold text-black bg-gradient-to-r from-[#00C2A8] to-[#00E6C8] hover:scale-[1.06] hover:shadow-lg hover:shadow-[#00E6C8aa] transition-all"
               >
                 Join Now
@@ -152,26 +112,25 @@ export default function HomePage() {
               </Link>
             </motion.div>
 
-            {/* Countdown */}
+            {/* Gym Status */}
             <motion.div
-              className="bg-[#0B1220] border border-white/10 rounded-xl p-4 inline-block"
+              className="bg-[#0B1220] border border-[#00E6C8]/30 rounded-xl p-4 inline-block shadow-lg shadow-[#00E6C811]"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.4, duration: 1 }}
             >
-              <p className="text-sm text-gray-400 mb-2">
-                Countdown —{" "}
-                <span className="text-[#00E6C8] font-semibold">
-                  December 15, 2025
-                </span>
-              </p>
-
-              <div className="grid grid-cols-4 gap-3 text-center">
-                <CountdownBlock label="Days" value={timeLeft.days} />
-                <CountdownBlock label="Hours" value={timeLeft.hours} />
-                <CountdownBlock label="Minutes" value={timeLeft.minutes} />
-                <CountdownBlock label="Seconds" value={timeLeft.seconds} />
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <div className="w-3 h-3 bg-[#00E6C8] rounded-full animate-pulse"></div>
+                  <div className="absolute inset-0 w-3 h-3 bg-[#00E6C8] rounded-full animate-ping opacity-75"></div>
+                </div>
+                <p className="text-lg font-bold text-white tracking-wide">
+                  GYM IS <span className="text-[#00E6C8]">OPEN NOW</span>
+                </p>
               </div>
+              <p className="text-xs text-gray-400 mt-1">
+                Visit us today at Station Road, Near RK Palace
+              </p>
             </motion.div>
           </div>
 
@@ -446,16 +405,7 @@ export default function HomePage() {
 /* SMALL COMPONENTS */
 /* ========================================================= */
 
-function CountdownBlock({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="bg-[#020617] border border-white/10 rounded-lg py-2 px-3">
-      <div className="text-2xl font-bold text-[#00E6C8]">
-        {value.toString().padStart(2, "0")}
-      </div>
-      <div className="text-xs text-gray-400 mt-1">{label}</div>
-    </div>
-  );
-}
+
 
 function FacilityCard({
   icon,

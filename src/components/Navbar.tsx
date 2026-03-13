@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { supabase } from "@/lib/supabaseClient";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -13,7 +12,6 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState<any>(null);
 
   /* -----------------------------------------
      ⭐ SCROLL EFFECT
@@ -38,32 +36,13 @@ export default function Navbar() {
   };
 
   /* -----------------------------------------
-     ⭐ AUTH STATE TRACKING
-  ----------------------------------------- */
-  useEffect(() => {
-    const loadUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user || null);
-    };
-    loadUser();
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user || null);
-      }
-    );
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
-
-  /* -----------------------------------------
      ⭐ STATIC NAV TABS
   ----------------------------------------- */
   const baseTabs = [
     { name: "Home", path: "/" },
     { name: "Membership", path: "/membership" },
-    { name: "FitTalks", path: "/fit-talks" },        // FIXED
-    { name: "PulseConnect", path: "/pulse-connect" } // placeholder
+    { name: "FitTalks", path: "/fit-talks" },        
+    { name: "PulseConnect", path: "/pulse-connect" } 
   ];
 
   return (
@@ -145,62 +124,16 @@ export default function Navbar() {
             </motion.div>
           ))}
 
-          {/* MEMBER PANEL: visible only when logged in */}
-          {user && (
-            <motion.div whileHover={{ scale: 1.1, x: 3 }}>
-              <Link
-                href="/member-panel"
-                onMouseEnter={() => smartPrefetch("/member-panel")}
-                className={`relative px-1 transition-all duration-300 ${
-                  pathname === "/member-panel"
-                    ? "text-[#00E6C8] font-semibold drop-shadow-[0_0_10px_#00E6C8]"
-                    : "text-gray-300 hover:text-[#00E6C8]"
-                }`}
-              >
-                My Fitness Hub
-
-                {pathname === "/member-panel" && (
-                  <motion.div
-                    layoutId="nav-underline"
-                    className="absolute left-0 -bottom-1 h-[3px] w-full bg-[#00E6C8] rounded-full"
-                  />
-                )}
-              </Link>
-            </motion.div>
-          )}
-
-          {/* LOGIN / SIGNUP / LOGOUT */}
-          {!user ? (
-            <>
-              <Link
-                href="/auth/login"
-                onMouseEnter={() => smartPrefetch("/auth/login")}
-                className="text-gray-300 hover:text-[#00E6C8]"
-              >
-                Login
-              </Link>
-
-              <motion.div whileHover={{ scale: 1.12 }}>
-                <Link
-                  href="/auth/signup"
-                  onMouseEnter={() => smartPrefetch("/auth/signup")}
-                  className="ml-4 px-4 py-2 rounded-md text-black font-semibold bg-gradient-to-r from-[#00C2A8] to-[#00E6C8] hover:shadow-xl hover:shadow-[#00E6C8aa]"
-                >
-                  Join Now
-                </Link>
-              </motion.div>
-            </>
-          ) : (
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                window.location.href = "/";
-              }}
-              className="ml-4 px-4 py-2 rounded-md font-semibold text-white bg-red-500/80 hover:bg-red-600 hover:scale-[1.07] hover:shadow-[0_0_14px_rgba(255,70,70,0.65)] active:scale-[0.95]"
+          {/* JOIN NOW BUTTON */}
+          <motion.div whileHover={{ scale: 1.12 }}>
+            <Link
+              href="/membership"
+              onMouseEnter={() => smartPrefetch("/membership")}
+              className="ml-4 px-5 py-2.5 rounded-xl text-black font-semibold bg-gradient-to-r from-[#00C2A8] to-[#00E6C8] hover:shadow-xl hover:shadow-[#00E6C8aa] transition-all flex items-center gap-2"
             >
-              Logout
-            </button>
-          )}
+              Join Now
+            </Link>
+          </motion.div>
         </div>
 
         {/* ---------------------- MOBILE MENU BUTTON ---------------------- */}
@@ -254,48 +187,13 @@ export default function Navbar() {
               </motion.div>
             ))}
 
-            {/* Member panel */}
-            {user && (
-              <Link
-                href="/member-panel"
-                onClick={() => setOpen(false)}
-                className="block py-2 hover:text-[#00E6C8]"
-              >
-                My Fitness Hub
-              </Link>
-            )}
-
-            {/* Auth buttons */}
-            {!user ? (
-              <>
-                <Link
-                  href="/auth/login"
-                  onClick={() => setOpen(false)}
-                  className="block py-2 hover:text-[#00E6C8]"
-                >
-                  Login
-                </Link>
-
-                <Link
-                  href="/auth/signup"
-                  onClick={() => setOpen(false)}
-                  className="block mt-3 text-[#00E6C8] font-semibold"
-                >
-                  Join Now
-                </Link>
-              </>
-            ) : (
-              <button
-                onClick={async () => {
-                  await supabase.auth.signOut();
-                  setOpen(false);
-                  window.location.href = "/";
-                }}
-                className="block py-2 text-red-400 font-semibold hover:text-red-300 hover:scale-[1.05]"
-              >
-                Logout
-              </button>
-            )}
+            <Link
+              href="/membership"
+              onClick={() => setOpen(false)}
+              className="block mt-4 py-3 rounded-xl text-center text-black bg-[#00E6C8] font-bold"
+            >
+              Join Now
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

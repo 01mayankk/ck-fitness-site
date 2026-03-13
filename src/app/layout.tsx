@@ -8,6 +8,9 @@ import { ThemeProvider } from "next-themes";
 // ⭐ NAVBAR
 import Navbar from "@/components/Navbar";
 
+// ⭐ PAGE TRACKER
+import PageTracker from "@/components/PageTracker";
+
 // ⭐ GOOGLE FONTS
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,6 +58,9 @@ export default function RootLayout({
           enableSystem={true}
           disableTransitionOnChange={false}
         >
+          {/* ⭐ PAGE TRACKER (INVISIBLE) */}
+          <PageTracker />
+
           {/* ⭐ NAVIGATION BAR */}
           <Navbar />
 

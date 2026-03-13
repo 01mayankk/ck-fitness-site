@@ -17,12 +17,10 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    // ⭐ CORRECT BASE URL
-    "baseUrl": "./src",
-    // ⭐ CORRECT ALIAS MAPPING (This fixes your issue)
+    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./*"
+        "src/*"
       ]
     },
     "plugins": [
